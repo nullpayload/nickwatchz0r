@@ -1,9 +1,3 @@
-# nickwatchz0r
-Python IRC bot to watch for nick mentions and send a Pushover alert.
-Here is a complete GitHub README using the name `nickwatchz0r` (as recommended earlier) and detailing the containerized setup, environment variables, and functionality of your script.
-
------
-
 # `NICKWATCHZ0R` 
 
 ### A Containerized IRC Mention Monitor with Pushover Notifications
@@ -108,7 +102,7 @@ This mode allows the bot to monitor different watch-nicks for different users an
 | `!register` | **PM the bot:** `!register <PushoverKey> <NickToWatch>` | Registers the user's Pushover key and sets the specific nick they want to monitor (e.g., `!register uJ0uP9r... myaltnick`). |
 | `!hello` | **Type in channel:** `!hello` | The bot responds with its status and provides the registration instructions. |
 
-### Data Persistence
+### Data Persistence - THIS DATA IS NOT ENCRYPTED
 
 When `ENABLE_REGISTRATION` is `true`, the user data (`Pushover Key` and `NickToWatch`) is saved to a file named `/app/users.json` within the container. **It is critical to use a Docker volume** (as shown in the compose example) to ensure this file persists across container restarts.
 

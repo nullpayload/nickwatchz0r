@@ -1,0 +1,47 @@
+services:
+  nickwatchz0r:
+    image: your_repo/nickwatchz0r:latest 
+    container_name: nickwatchz0r
+    restart: unless-stopped
+    
+    # ----------------------------------------------------
+    # ENVIRONMENT VARIABLES
+    # ----------------------------------------------------
+    environment:
+      # --- IRC CONNECTION ---
+      IRC_SERVER: 'irc.libera.chat'        # The IRC server hostname
+      IRC_PORT: 6697                       # Use 6697 for secure TLS/SSL connection
+      IRC_CHANNEL: '#mychannel'            # The channel to monitor (e.g., #support)
+      BOT_NICK: 'nickwatchz0r'             # The nickname the bot will use
+      BOT_USER_ID: 'nickwatchz0r'           # Added: The IRC user ID (username)
+      BOT_REAL_NAME: 'nickwatchz0r ver 1.0'  # Added: The IRC real name (GECOS)
+      
+      # --- PUSHOVER CREDENTIALS (REQUIRED) ---
+      PUSHOVER_APP_TOKEN: 'YOUR_PUSHOVER_APP_TOKEN_HERE' # Required: Pushover Application Token
+      
+      # --- MODE & OWNER CONFIG ---
+      # Set to 'false' for single owner monitoring only.
+      # Set to 'true' to enable the '!register' multi-user system.
+      ENABLE_REGISTRATION: 'false'
+
+      # Required if ENABLE_REGISTRATION is 'false':
+      PUSHOVER_USER_KEY: 'YOUR_PUSHOVER_USER_KEY_HERE'  # Your personal Pushover User Key
+      PERSONAL_NICK: 'YourIRCnick'                   # The nickname YOU want to be notified for
+
+      # --- SECURITY ---
+      # Set to 'true' only if you encounter certificate errors (e.g., self-signed certs).
+      IRC_INSECURE_TLS: 'false'
+      
+    # ----------------------------------------------------
+    # VOLUMES (For persistent user data)
+    # ----------------------------------------------------
+    volumes:
+      # Maps the container's /app/data directory to a local folder named 'data'.
+      # This ensures 'users.json' persists across restarts when registration is enabled.
+      - ./data:/app/data
+      
+    # ----------------------------------------------------
+    # SECURITY (Run as non-root user 'appuser' defined in Dockerfile)
+    # ----------------------------------------------------
+    # Running as non-root is a best practice for security.
+    user: "appuser"
