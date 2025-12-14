@@ -1,6 +1,6 @@
 services:
   nickwatchz0r:
-    image: your_repo/nickwatchz0r:latest 
+    image: nullpayload/nickwatchz0r:latest 
     container_name: nickwatchz0r
     restart: unless-stopped
     

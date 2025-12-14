@@ -1,42 +1,69 @@
-# Stage 1: Build & Setup (Base Image: Debian Bookworm Slim)
-FROM debian:bookworm-slim AS base
+# ====================================================================
+# STAGE 1: BUILDER - Handles installation and cleanup
+# ====================================================================
+FROM debian:bookworm-slim AS builder
 
-# Set the working directory for the application
-WORKDIR /app
-
-# 1. Install Python 3.11 and necessary build tools
-# We install python3 and python3-pip directly from Debian repositories.
-# The 'build-essential' and 'libssl-dev' packages are needed to correctly compile 
-# some Python libraries (like those used by 'requests' or 'irc3') securely.
-# We then clean up apt cache to keep the final image size minimal.
+# 1. Install System Dependencies
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-        python3 \
-        python3-pip \
-        python3-venv \
-        build-essential \
-        libssl-dev \
-        ca-certificates && \
+        python3 python3-pip python3-venv \
+        build-essential libssl-dev libffi-dev zlib1g-dev ca-certificates && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Python Dependencies 
+# Set the virtual environment path and pip cache directory
+ENV VENV_PATH=/app/.venv
+ENV PATH="$VENV_PATH/bin:$PATH"
+ENV PIP_CACHE_DIR=/tmp/pip_cache
+
+# 2. Setup VENV and Install Dependencies
+WORKDIR /tmp/build
 COPY requirements.txt .
 
-# Use pip to install dependencies globally
-RUN pip install --no-cache-dir -r requirements.txt
+# Create VENV and install application dependencies - Simplified and corrected
+# This command automatically installs pip/setuptools/wheel into the VENV
+# and then runs the install from requirements.txt.
+RUN python3 -m venv $VENV_PATH && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Add Non-Root User 
+# 3. VULNERABILITY PATCH (Crucial: Upgrade setuptools AFTER dependencies)
+RUN pip install --no-cache-dir --upgrade setuptools pip wheel
+
+
+# ====================================================================
+# STAGE 2: RUNTIME - Minimal image for execution
+# ====================================================================
+FROM debian:bookworm-slim AS final
+
+# This installs the base python interpreter required by the VENV symlinks.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3 \
+        python3-venv && \ 
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 1. Create Non-Root User (Must happen in the final stage)
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
-# Copy the source code (Assuming script is at 'src/nickwatchz0r.py')
-COPY src/ /app/src/
+# Set working directory
+WORKDIR /app
 
-# Change ownership of the /app directory (and all files) to the new non-root user
+# 2. Copy ONLY the VENV and Source Code from the builder stage
+# This step leaves behind all build tools, caches, and old package metadata.
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy source code and ensure data volume exists
+COPY src/ /app/src/
+RUN mkdir -p /app/data
+
+# 3. Final Security and Command
+# Change ownership to the non-root user
 RUN chown -R appuser:appgroup /app
 
-# Switch to the non-root user for running the application
+# Switch to the non-root user
 USER appuser
 
-# Command to run the bot when the container starts
-CMD ["python3", "src/nickwatchz0r.py"]
+# Command to run the bot
+CMD ["/app/.venv/bin/python3", "src/nickwatchz0r.py"]

@@ -13,11 +13,10 @@ The easiest way to run `nickwatchz0r` is using Docker Compose.
 1.  **Create a `docker-compose.yml` file:**
 
     ```yaml
-    version: '3.8'
     services:
       nickwatchz0r:
-        image: your_repo/nickwatchz0r:latest # Replace with your image location
-        container_name: irc_notifier
+        image: nullpayload/nickwatchz0r:latest  
+        container_name: nickwatchz0r
         restart: unless-stopped
         environment:
           # --- IRC CONFIG ---
