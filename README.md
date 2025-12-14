@@ -25,6 +25,8 @@ The easiest way to run `nickwatchz0r` is using Docker Compose.
           IRC_PORT: 6697               # Default is 6667 (insecure), use 6697 for TLS/SSL
           IRC_CHANNEL: '#mychannel'    # Required: The channel to join (e.g., #support)
           BOT_NICK: 'nickwatchz0r'     # The nickname the bot will use
+          BOT_USER_ID: 'nickwatchz0r'           # Added: The IRC user ID (username)
+          BOT_REAL_NAME: 'nickwatchz0r ver 1.0'  # Added: The IRC real name (GECOS)
 
           # --- PUSHOVER CREDENTIALS (REQUIRED) ---
           PUSHOVER_APP_TOKEN: 'YOUR_APP_TOKEN' # Required: Your Pushover Application Token
