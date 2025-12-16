@@ -57,12 +57,13 @@ COPY --from=builder /app/.venv /app/.venv
 # Copy source code and ensure data volume exists
 
 COPY src/ /app/src/
-COPY app/users.json /app/users.json
 RUN mkdir -p /app/data
+COPY app/data/ /app/data/
 
 # 3. Final Security and Command
 # Change ownership to the non-root user
 RUN chown -R appuser:appgroup /app
+
 
 # Switch to the non-root user
 USER appuser

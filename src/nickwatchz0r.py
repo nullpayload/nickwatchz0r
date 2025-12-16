@@ -12,7 +12,7 @@ from typing import Dict, Any
 logging.basicConfig(level=logging.INFO)
 
 # Global constants for file access and user data
-USER_FILE = "/app/users.json"
+USER_FILE = "/app/data/users.json"
 USER_DATA: Dict[str, Any] = {}
 
 # --- Environment Variable Loading ---
