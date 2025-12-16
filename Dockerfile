@@ -58,7 +58,7 @@ COPY --from=builder /app/.venv /app/.venv
 
 COPY src/ /app/src/
 RUN mkdir -p /app/data
-COPY app/data/ /app/data/
+COPY app/data/users.json /app/data/
 
 # 3. Final Security and Command
 # Change ownership to the non-root user
