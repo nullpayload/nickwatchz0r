@@ -12,7 +12,7 @@ from typing import Dict, Any
 logging.basicConfig(level=logging.INFO)
 
 # Global constants for file access and user data
-USER_FILE = "/app/users.json"
+USER_FILE = "/app/data/users.json"
 USER_DATA: Dict[str, Any] = {}
 
 # --- Environment Variable Loading ---
@@ -100,6 +100,8 @@ def send_pushover_notification(bot, title: str, message: str, priority: int = 0,
 
     try:
         response = requests.post(url, data=payload, timeout=5)
+        if response.status_code != 200:
+            bot.log.error(f"Pushover rejected the request: {response.text}")
         response.raise_for_status()
         bot.log.info(f"Pushover notification sent successfully to user {user_key_to_use[:8]}...")
     except requests.exceptions.RequestException as e:
